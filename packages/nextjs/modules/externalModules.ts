@@ -2046,7 +2046,6 @@ const externalModules = {
       },
     },
   },
-  164: {},
   177: {
     mint_stage: {
       bytecode:
@@ -4071,7 +4070,6 @@ const externalModules = {
       },
     },
   },
-  250: {},
 } as const;
 
 export default externalModules satisfies GenericModulesDeclaration;
