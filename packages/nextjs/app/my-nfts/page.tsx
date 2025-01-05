@@ -17,7 +17,7 @@ const MyNfts: NextPage = () => {
     functionName: "get_registry",
   });
 
-  const registeredCollections = registry?.[0]?.map((collection: any) => collection.inner) || [];
+  const registeredCollections = registry?.map((collection: any) => collection.inner) || [];
 
   const handleCollectionChange = (value: string) => {
     if (value === "all") {

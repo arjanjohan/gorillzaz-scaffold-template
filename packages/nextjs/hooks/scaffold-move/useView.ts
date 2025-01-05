@@ -13,7 +13,7 @@ export type ViewArguments = {
   function_args?: string[];
 };
 
-export const view = async (request: ViewArguments, aptos: Aptos): Promise<any[]> => {
+export const view = async (request: ViewArguments, aptos: Aptos): Promise<any> => {
   const viewResult = await aptos.view({
     payload: {
       function: `${request.module_address}::${request.module_name}::${request.function_name}`,
@@ -21,6 +21,10 @@ export const view = async (request: ViewArguments, aptos: Aptos): Promise<any[]>
       functionArguments: request.function_args || [],
     },
   });
+
+  if (viewResult.length === 1) {
+    return viewResult[0];
+  }
 
   return viewResult;
 };
