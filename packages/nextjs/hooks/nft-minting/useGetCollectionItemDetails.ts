@@ -1,11 +1,7 @@
-import { useView } from "../scaffold-move/useView";
 import { useGetIpfsMetadata } from "./useGetIpfsMetadata";
-import { useGetCollectionData } from "~~/hooks/nft-minting/useGetCollectionData";
 import { useGetAccountResource } from "~~/hooks/scaffold-move/useGetAccountResource";
 import { TokenMetadata } from "~~/utils/nft-minting/ipfsUploader";
 import { getIpfsHash } from "~~/utils/nft-minting/ipfsUploader";
-
-const MODULE_NAME = process.env.NEXT_PUBLIC_MODULE_NAME ?? "launchpad";
 
 export interface CollectionItemDetails {
   collection_address: string;
