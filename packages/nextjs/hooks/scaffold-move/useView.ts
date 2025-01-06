@@ -46,7 +46,7 @@ export const useView = <TModuleName extends ModuleName>({
 }: UseViewConfig<TModuleName>) => {
   const network = useTargetNetwork();
   const aptos = useAptosClient(network.targetNetwork.id);
-  const [data, setData] = useState<any[] | null>(null);
+  const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
