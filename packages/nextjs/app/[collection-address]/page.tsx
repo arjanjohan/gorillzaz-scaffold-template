@@ -58,6 +58,7 @@ const CollectionDetailsPage: NextPage = () => {
               <Address address={collectionAddress} size="sm" />
             </div>
           </div>
+          <MintStats collectionDetails={collectionDetails} />
 
           <div className="p-6 bg-base-100 rounded-xl">
             <div className="space-y-4">
@@ -79,7 +80,6 @@ const CollectionDetailsPage: NextPage = () => {
           {totalQuantity > 0 && (
             <MintOverview collectionDetails={collectionDetails} quantities={quantities}/>
           )}
-          <MintStats collectionDetails={collectionDetails} />
         </div>
       </div>
     </div>
