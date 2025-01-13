@@ -1,15 +1,22 @@
 "use client";
 
 import { Collection } from "./components/collection";
+import { useQuery } from "@tanstack/react-query";
 import type { NextPage } from "next";
-import { useView } from "~~/hooks/scaffold-move/useView";
-
-const MODULE_NAME = process.env.NEXT_PUBLIC_MODULE_NAME ?? "launchpad";
+import { useLaunchpad } from "~~/hooks/nft-minting/useLaunchpad";
 
 const CollectionsPage: NextPage = () => {
-  const { data: registry } = useView({
-    moduleName: MODULE_NAME,
-    functionName: "get_registry",
+  const launchpad = useLaunchpad();
+  const { data: registry } = useQuery({
+    queryKey: ["registry"],
+    queryFn: async () => {
+      return (
+        await launchpad.view.get_registry({
+          typeArguments: [],
+          functionArguments: [],
+        })
+      )[0];
+    },
   });
 
   return (

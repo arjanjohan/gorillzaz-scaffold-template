@@ -2040,6 +2040,7 @@ __metadata:
     "@rainbow-me/rainbowkit": 2.1.6
     "@tanstack/react-query": ^5.56.2
     "@telegram-apps/bridge": ^1.2.1
+    "@thalalabs/surf": ^1.7.3
     "@trivago/prettier-plugin-sort-imports": ^4.3.0
     "@types/node": ^17.0.45
     "@types/nprogress": ^0.2.3
@@ -2433,6 +2434,22 @@ __metadata:
   version: 1.2.0
   resolution: "@telegram-apps/types@npm:1.2.0"
   checksum: 563babf28d58f568e3e11737fa14f5192759bb5028f041e7d00004afba54009677d0cdb5b5f4f9243e0cc012f1db04e62debc8b66c923dab768851ecfbae47c7
+  languageName: node
+  linkType: hard
+
+"@thalalabs/surf@npm:^1.7.3":
+  version: 1.7.3
+  resolution: "@thalalabs/surf@npm:1.7.3"
+  peerDependencies:
+    "@aptos-labs/ts-sdk": ^1.26.0
+    "@aptos-labs/wallet-adapter-react": ^3.5.9
+    react: ^18.2.0
+  peerDependenciesMeta:
+    "@aptos-labs/wallet-adapter-react":
+      optional: true
+    react:
+      optional: true
+  checksum: 6a1c939e12d53f49bd79001f6158cd836b36a593d8ba3f890b673a909f18a16584a87e67354577f07ef52c64e92f8656e904018bd0c9869c0792aa4cb0544e47
   languageName: node
   linkType: hard
 
