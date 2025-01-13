@@ -1,8 +1,5 @@
 import { useMintStage } from "./useMintStage";
 import { AccountInfo } from "@aptos-labs/wallet-adapter-react";
-import { useView } from "~~/hooks/scaffold-move/useView";
-
-const MODULE_NAME = process.env.NEXT_PUBLIC_MODULE_NAME ?? "launchpad";
 
 interface MintStageProps {
   stageName: string;
@@ -21,7 +18,6 @@ export const MintStage = ({
   onQuantityChange,
 }: MintStageProps) => {
   const { data: mintData } = useMintStage(collectionAddress, stageName, account?.address as `0x${string}`);
-  console.log("MINT DATA", mintData);
 
   const startTime = mintData?.stageTimes ? mintData?.stageTimes[0] : 0;
   const endTime = mintData?.stageTimes ? mintData?.stageTimes[1] : 0;

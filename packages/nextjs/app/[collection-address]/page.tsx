@@ -5,36 +5,50 @@ import { useParams } from "next/navigation";
 import MintOverview from "./components/mint-overview";
 import { MintStage } from "./components/mint-stage";
 import MintStats from "./components/mint-stats";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { useQuery } from "@tanstack/react-query";
 import type { NextPage } from "next";
 import NftImage from "~~/components/nft-minting/nft-image";
 import { Address } from "~~/components/scaffold-move/Address";
 import { useGetCollectionDetails } from "~~/hooks/nft-minting/useGetCollectionDetails";
-import { useView } from "~~/hooks/scaffold-move/useView";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
-
-const LAUNCHPAD_MODULE_NAME = process.env.NEXT_PUBLIC_MODULE_NAME ?? "launchpad";
-const MINT_STAGE_MODULE_NAME = "mint_stage";
+import { useLaunchpad } from "~~/hooks/nft-minting/useLaunchpad";
+import { useMintStages } from "~~/hooks/nft-minting/useMintStages";
 
 const CollectionDetailsPage: NextPage = () => {
+  const launchpad = useLaunchpad();
+  const mintStages = useMintStages();
   const { account } = useWallet();
   const params = useParams();
-  const collectionAddress =
-    typeof params["collection-address"] === "string" ? params["collection-address"] : params["collection-address"][0];
+  const collectionAddress = (
+    typeof params["collection-address"] === "string" ? params["collection-address"] : params["collection-address"][0]
+  ) as `0x${string}`;
 
   const { data: collectionDetails } = useGetCollectionDetails(collectionAddress);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const totalQuantity = Object.values(quantities).reduce((sum, q) => sum + q, 0);
 
-  const { data: stages } = useView({
-    moduleName: MINT_STAGE_MODULE_NAME,
-    functionName: "stages",
-    args: [collectionAddress],
+  const { data: stages } = useQuery({
+    queryKey: ["stages", collectionAddress],
+    queryFn: async () => {
+      return (
+        await mintStages.view.stages({
+          functionArguments: [collectionAddress],
+          typeArguments: [],
+        })
+      )[0];
+    },
   });
 
-  const { data: isMintEnabled } = useView({
-    moduleName: LAUNCHPAD_MODULE_NAME,
-    functionName: "is_mint_enabled",
-    args: [collectionAddress],
+  const { data: isMintEnabled } = useQuery({
+    queryKey: ["isMintEnabled", collectionAddress],
+    queryFn: async () => {
+      return (
+        await launchpad.view.is_mint_enabled({
+          functionArguments: [collectionAddress],
+          typeArguments: [],
+        })
+      )[0];
+    },
   });
 
   const handleQuantityChange = (stageName: string, quantity: number) => {
@@ -77,9 +91,7 @@ const CollectionDetailsPage: NextPage = () => {
             </div>
           </div>
 
-          {totalQuantity > 0 && (
-            <MintOverview collectionDetails={collectionDetails} quantities={quantities}/>
-          )}
+          {totalQuantity > 0 && <MintOverview collectionDetails={collectionDetails} quantities={quantities} />}
         </div>
       </div>
     </div>

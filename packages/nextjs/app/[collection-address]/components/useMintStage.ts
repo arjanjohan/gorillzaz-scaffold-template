@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useLaunchpad } from "~~/hooks/scaffold-move/useLaunchpad";
+import { useLaunchpad } from "~~/hooks/nft-minting/useLaunchpad";
 
 export function useMintStage(
   collectionAddress: `0x${string}`,

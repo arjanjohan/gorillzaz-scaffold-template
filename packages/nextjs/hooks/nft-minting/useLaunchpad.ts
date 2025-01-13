@@ -1,5 +1,5 @@
-import { useAptosClient } from "./useAptosClient";
-import { useTargetNetwork } from "./useTargetNetwork";
+import { useAptosClient } from "../scaffold-move/useAptosClient";
+import { useTargetNetwork } from "../scaffold-move/useTargetNetwork";
 import { createSurfClient } from "@thalalabs/surf";
 import deployedModules from "~~/modules/deployedModules";
 
