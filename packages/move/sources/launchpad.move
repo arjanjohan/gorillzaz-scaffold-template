@@ -392,6 +392,40 @@ module deployment_addr::launchpad_double_whitelist {
         });
     }
 
+    public entry fun reveal_nft(
+        sender: &signer,
+        collection_obj: Object<Collection>,
+        nft_obj: Object<Token>,
+        name: String,
+        description: String,
+        uri: String,
+        prop_names: vector<String>,
+        prop_values: vector<String>
+    ) acquires CollectionOwnerObjConfig, CollectionConfig, Config {
+        let config = borrow_global_mut<Config>(@deployment_addr);
+        let sender_addr = signer::address_of(sender);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
+
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
+
+        let collection_owner_obj = collection_config.collection_owner_obj;
+        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
+            object::object_address(&collection_owner_obj)
+        );
+        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+
+        token_components::set_name(collection_owner_obj_signer, nft_obj, name);
+        token_components::set_description(collection_owner_obj_signer, nft_obj, description);
+        token_components::set_uri(collection_owner_obj_signer, nft_obj, uri);
+
+        for (i in 0..vector::length(&prop_names)) {
+            let prop_name = *vector::borrow(&prop_names, i);
+            let prop_value = *vector::borrow(&prop_values, i);
+            token_components::add_typed_property(collection_owner_obj_signer, nft_obj, prop_name, prop_value);
+        };
+
+    }
+
     // ================================= View  ================================= //
 
     #[view]
@@ -751,5 +785,12 @@ module deployment_addr::launchpad_double_whitelist {
     #[test_only]
     public fun init_module_for_test(sender: &signer) {
         init_module(sender);
+    }
+
+        #[test_only]
+    public fun test_mint_nft(sender_addr: address, collection_obj: Object<Collection>): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
+        let nft = mint_nft_internal(sender_addr, collection_obj);
+
+        nft
     }
 }

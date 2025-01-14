@@ -177,4 +177,68 @@ module deployment_addr::test_end_to_end {
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
     }
+
+    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200)]
+    fun test_should_reveal_nft(
+        aptos_framework: &signer,
+        sender: &signer,
+        user1: &signer,
+    ) {
+        let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
+
+        let user1_addr = signer::address_of(user1);
+
+        // current timestamp is 0 after initialization
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        account::create_account_for_test(user1_addr);
+        coin::register<AptosCoin>(user1);
+
+        launchpad_double_whitelist::init_module_for_test(sender);
+
+        launchpad_double_whitelist::create_collection(
+            sender,
+            string::utf8(b"description"),
+            string::utf8(b"name"),
+            string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
+            10,
+            option::some(10),
+            option::some(3),
+
+            option::some(vector[user1_addr]),
+            option::some(vector[1]),
+            option::some(timestamp::now_seconds()),
+            option::some(timestamp::now_seconds() + 100),
+            option::some(3),
+
+            option::some(vector[user1_addr]),
+            option::some(vector[1]),
+            option::some(timestamp::now_seconds() + 100),
+            option::some(timestamp::now_seconds() + 200),
+            option::some(3),
+
+            option::some(timestamp::now_seconds() + 300),
+            option::some(timestamp::now_seconds() + 400),
+            option::some(2),
+            option::some(10),
+        );
+        let registry = launchpad_double_whitelist::get_registry();
+        let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
+
+        assert!(launchpad_double_whitelist::is_mint_enabled(collection_1), 1);
+
+        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
+        aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
+
+        let nft_obj = launchpad_double_whitelist::test_mint_nft(user1_addr, collection_1);
+
+        let name = string::utf8(b"name");
+        let description = string::utf8(b"description");
+        let uri = string::utf8(b"https://gateway.irys.xyz/manifest_id/test.jpg");
+        let prop_names = vector[string::utf8(b"prop_name")];
+        let prop_values = vector[string::utf8(b"prop_value")];
+        launchpad_double_whitelist::reveal_nft(sender, collection_1, nft_obj, name, description, uri, prop_names, prop_values);
+
+        coin::destroy_burn_cap(burn_cap);
+        coin::destroy_mint_cap(mint_cap);
+    }
 }
