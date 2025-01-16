@@ -4,13 +4,20 @@ module deployment_addr::test_end_to_end {
     use std::signer;
     use std::string;
     use std::vector;
+    use aptos_std::debug;
 
     use aptos_framework::aptos_coin::{Self, AptosCoin};
     use aptos_framework::coin;
     use aptos_framework::account;
     use aptos_framework::timestamp;
+    use aptos_framework::object::{Self};
+    
+    use aptos_token::token;
+    use aptos_token_objects::aptos_token;
 
     use aptos_token_objects::collection;
+    use aptos_token_objects::token::Token;
+    use minter::token_components;
 
     use deployment_addr::launchpad_double_whitelist;
 
@@ -198,7 +205,7 @@ module deployment_addr::test_end_to_end {
         launchpad_double_whitelist::create_collection(
             sender,
             string::utf8(b"description"),
-            string::utf8(b"name"),
+            string::utf8(b"collection name"),
             string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
             10,
             option::some(10),
@@ -230,14 +237,26 @@ module deployment_addr::test_end_to_end {
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         let nft_obj = launchpad_double_whitelist::test_mint_nft(user1_addr, collection_1);
+        debug::print(&nft_obj);
 
+        let token_name = &aptos_token_objects::token::name(nft_obj);
+        debug::print(token_name);
+        
         let name = string::utf8(b"name");
         let description = string::utf8(b"description");
         let uri = string::utf8(b"https://gateway.irys.xyz/manifest_id/test.jpg");
         let prop_names = vector[string::utf8(b"prop_name")];
         let prop_values = vector[string::utf8(b"prop_value")];
+        
         launchpad_double_whitelist::reveal_nft(sender, collection_1, nft_obj, name, description, uri, prop_names, prop_values);
 
+        let token_addr = object::object_address(&nft_obj);
+        let token = object::address_to_object<Token>(token_addr);
+
+        assert!(aptos_token_objects::token::name(token) == name, 2);
+        assert!(aptos_token_objects::token::description(token) == description, 3);
+        assert!(aptos_token_objects::token::uri(token) == uri, 4);
+        
         coin::destroy_burn_cap(burn_cap);
         coin::destroy_mint_cap(mint_cap);
     }

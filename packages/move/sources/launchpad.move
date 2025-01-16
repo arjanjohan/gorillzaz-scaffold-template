@@ -772,8 +772,8 @@ module deployment_addr::launchpad_double_whitelist {
 
     // ================================= Allowlist checker ================================== //
 
-    /// Check if user is allowlisted for a specific stage
     #[view]
+    /// Check if user is allowlisted for a specific stage
     public fun is_allowlisted(collection_obj: Object<Collection>, stage_name: String, user_addr: address): bool {
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
         mint_stage::is_allowlisted(collection_obj, stage_idx, user_addr)
@@ -787,7 +787,7 @@ module deployment_addr::launchpad_double_whitelist {
         init_module(sender);
     }
 
-        #[test_only]
+    #[test_only]
     public fun test_mint_nft(sender_addr: address, collection_obj: Object<Collection>): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
         let nft = mint_nft_internal(sender_addr, collection_obj);
 
