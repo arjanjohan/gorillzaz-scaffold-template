@@ -250,6 +250,9 @@ module deployment_addr::test_end_to_end {
         
         launchpad_double_whitelist::reveal_nft(sender, collection_1, nft_obj, name, description, uri, prop_names, prop_values);
 
+        // Also test update properties more than once
+        launchpad_double_whitelist::reveal_nft(sender, collection_1, nft_obj, name, description, uri, prop_names, prop_values);
+
         let token_addr = object::object_address(&nft_obj);
         let token = object::address_to_object<Token>(token_addr);
 

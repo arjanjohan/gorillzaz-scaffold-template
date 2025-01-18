@@ -16,6 +16,8 @@ module deployment_addr::launchpad_double_whitelist {
     use aptos_token_objects::royalty::{Self, Royalty};
     use aptos_token_objects::token::{Self, Token};
 
+    use aptos_token_objects::aptos_token::{Self, AptosToken};
+
     use minter::token_components;
     use minter::mint_stage;
     use minter::collection_components;
@@ -421,7 +423,12 @@ module deployment_addr::launchpad_double_whitelist {
         for (i in 0..vector::length(&prop_names)) {
             let prop_name = *vector::borrow(&prop_names, i);
             let prop_value = *vector::borrow(&prop_values, i);
-            token_components::add_typed_property(collection_owner_obj_signer, nft_obj, prop_name, prop_value);
+            // Check if the property already exists
+            if (aptos_token_objects::property_map::contains_key(&nft_obj, &prop_name)) {
+                token_components::update_typed_property(collection_owner_obj_signer, nft_obj, prop_name, prop_value);
+            } else {
+                token_components::add_typed_property(collection_owner_obj_signer, nft_obj, prop_name, prop_value);
+            }
         };
 
     }
