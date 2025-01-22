@@ -12,12 +12,8 @@ module deployment_addr::test_end_to_end {
     use aptos_framework::timestamp;
     use aptos_framework::object::{Self};
     
-    use aptos_token::token;
-    use aptos_token_objects::aptos_token;
-
     use aptos_token_objects::collection;
     use aptos_token_objects::token::Token;
-    use minter::token_components;
 
     use deployment_addr::launchpad_double_whitelist;
 
@@ -241,7 +237,7 @@ module deployment_addr::test_end_to_end {
 
         let token_name = &aptos_token_objects::token::name(nft_obj);
         debug::print(token_name);
-        
+
         let name = string::utf8(b"name");
         let description = string::utf8(b"description");
         let uri = string::utf8(b"https://gateway.irys.xyz/manifest_id/test.jpg");

@@ -16,8 +16,6 @@ module deployment_addr::launchpad_double_whitelist {
     use aptos_token_objects::royalty::{Self, Royalty};
     use aptos_token_objects::token::{Self, Token};
 
-    use aptos_token_objects::aptos_token::{Self, AptosToken};
-
     use minter::token_components;
     use minter::mint_stage;
     use minter::collection_components;
@@ -56,6 +54,8 @@ module deployment_addr::launchpad_double_whitelist {
     const EONLY_ADMIN_CAN_CREATE_ALLOWLIST: u64 = 16;
     /// Only admin can modify allowlist
     const EONLY_ADMIN_CAN_MODIFY_ALLOWLIST: u64 = 17;
+    /// Only admin can reveal collection
+    const EONLY_ADMIN_CAN_REVEAL_COLLECTION: u64 = 18;
 
     /// Default to mint 0 amount to creator when creating collection
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -406,7 +406,7 @@ module deployment_addr::launchpad_double_whitelist {
     ) acquires CollectionOwnerObjConfig, CollectionConfig, Config {
         let config = borrow_global_mut<Config>(@deployment_addr);
         let sender_addr = signer::address_of(sender);
-        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_REVEAL_COLLECTION);
 
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
 
@@ -722,8 +722,6 @@ module deployment_addr::launchpad_double_whitelist {
     entry fun clear_allowlist(
         sender: &signer,
         collection_obj: Object<Collection>,
-        collection_obj_addr: address,
-        collection_obj_signer: &signer,
         collection_owner_obj_signer: &signer,
         stage_name: String,
     ) acquires Config {
@@ -743,19 +741,23 @@ module deployment_addr::launchpad_double_whitelist {
     entry fun update_allowlist(
         sender: &signer,
         collection_obj: Object<Collection>,
-        collection_obj_addr: address,
-        collection_obj_signer: &signer,
-        collection_owner_obj_signer: &signer,
         stage_name: String,
         allowlist_addresses: vector<address>,
         allowlist_mint_limit_per_addr: vector<u64>
-    ) acquires Config {
+    ) acquires Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@deployment_addr);
         assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_MODIFY_ALLOWLIST);
         assert!(allowlist_exists(collection_obj, stage_name), EALLOWLIST_NOT_FOUND);
         assert!(vector::length(&allowlist_addresses) == vector::length(&allowlist_mint_limit_per_addr), EALLOWLIST_AND_MINT_LIMIT_PER_ADDR_MUST_BE_SAME_LENGTH);
 
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
+        let collection_owner_obj = collection_config.collection_owner_obj;
+        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
+            object::object_address(&collection_owner_obj)
+        );
+        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+        
         for (i in 0..vector::length(&allowlist_addresses)) {
             let mint_limit = *vector::borrow(&allowlist_mint_limit_per_addr, i);
             if (mint_limit > 0) {
