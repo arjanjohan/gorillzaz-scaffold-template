@@ -408,13 +408,7 @@ module deployment_addr::launchpad_double_whitelist {
         let sender_addr = signer::address_of(sender);
         assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_REVEAL_COLLECTION);
 
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-
-        let collection_owner_obj = collection_config.collection_owner_obj;
-        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
-            object::object_address(&collection_owner_obj)
-        );
-        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
 
         token_components::set_name(collection_owner_obj_signer, nft_obj, name);
         token_components::set_description(collection_owner_obj_signer, nft_obj, description);
@@ -666,13 +660,7 @@ module deployment_addr::launchpad_double_whitelist {
         sender_addr: address,
         collection_obj: Object<Collection>,
     ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-
-        let collection_owner_obj = collection_config.collection_owner_obj;
-        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
-            object::object_address(&collection_owner_obj)
-        );
-        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
 
         let next_nft_id = *option::borrow(&collection::count(collection_obj)) + 1;
 
@@ -722,13 +710,14 @@ module deployment_addr::launchpad_double_whitelist {
     entry fun clear_allowlist(
         sender: &signer,
         collection_obj: Object<Collection>,
-        collection_owner_obj_signer: &signer,
         stage_name: String,
-    ) acquires Config {
+    ) acquires Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@deployment_addr);
         assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_MODIFY_ALLOWLIST);
         assert!(allowlist_exists(collection_obj, stage_name), EALLOWLIST_NOT_FOUND);
+
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
 
         mint_stage::clear_allowlist(
             collection_owner_obj_signer,
@@ -751,12 +740,7 @@ module deployment_addr::launchpad_double_whitelist {
         assert!(allowlist_exists(collection_obj, stage_name), EALLOWLIST_NOT_FOUND);
         assert!(vector::length(&allowlist_addresses) == vector::length(&allowlist_mint_limit_per_addr), EALLOWLIST_AND_MINT_LIMIT_PER_ADDR_MUST_BE_SAME_LENGTH);
 
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        let collection_owner_obj = collection_config.collection_owner_obj;
-        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
-            object::object_address(&collection_owner_obj)
-        );
-        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
         
         for (i in 0..vector::length(&allowlist_addresses)) {
             let mint_limit = *vector::borrow(&allowlist_mint_limit_per_addr, i);
@@ -801,5 +785,15 @@ module deployment_addr::launchpad_double_whitelist {
         let nft = mint_nft_internal(sender_addr, collection_obj);
 
         nft
+    }
+
+    /// Gets the collection owner signer from a collection object
+    fun get_collection_owner_signer(collection_obj: &Object<Collection>): signer acquires CollectionConfig, CollectionOwnerObjConfig {
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(collection_obj));
+        let collection_owner_obj = collection_config.collection_owner_obj;
+        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
+            object::object_address(&collection_owner_obj)
+        );
+        object::generate_signer_for_extending(&collection_owner_config.extend_ref)
     }
 }
