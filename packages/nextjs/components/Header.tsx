@@ -4,9 +4,8 @@ import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import { CustomConnectButton } from "~~/components/scaffold-move";
-// import { FaucetButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-move";
 
 type HeaderMenuLink = {
@@ -21,21 +20,12 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
+    label: "Mint",
+    href: "/0xb157c9636dc18c8bfeb07ab0c6a30d4b0e75f70b9ddbf6b8efc4ad8ef2f84755",
+  },
+  {
     label: "My NFTs",
     href: "/my-nfts",
-  },
-  {
-    label: "Collections",
-    href: "/collections",
-  },
-  {
-    label: "Create",
-    href: "/create",
-  },
-  {
-    label: "Debug Modules",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
   },
 ];
 
@@ -106,8 +96,8 @@ export const Header = () => {
             <Image alt="SM logo" className="cursor-pointer" fill src="/logo.png" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold leading-tight">Scaffold-Move</span>
-            <span className="text-xs">Move NFT launchpad</span>
+            <span className="font-bold leading-tight">Gorilla Moverz</span>
+            <span className="text-xs">Community Collection</span>
           </div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
