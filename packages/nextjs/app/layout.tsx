@@ -5,8 +5,8 @@ import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/scaffold-move/getMetadata";
 
 export const metadata = getMetadata({
-  title: "Scaffold-Move App",
-  description: "Built with 🏗 Scaffold-Move",
+  title: "Gorilla Moverz Community Collection",
+  description: "The most gorillish community collection on Movement",
 });
 
 const ScaffoldMoveApp = ({ children }: { children: React.ReactNode }) => {
