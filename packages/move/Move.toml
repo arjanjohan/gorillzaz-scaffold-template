@@ -8,5 +8,5 @@ AptosTokenObjects = { git = "https://github.com/aptos-labs/aptos-core.git", rev 
 TokenMinter = { git = "https://github.com/aptos-labs/token-minter.git", rev = "main", subdir = "token-minter" }
                                                                                                                                                                                    
 [addresses]
-deployment_addr='0xd6deab32503e087b7935e5c076ffc2265e2bb0fe73d45ef41c0bfcf050b9583c'
+deployment_addr='0x342c28f358dd569c24552274c12debad1486271022380c930c987ab08a328f42'
 minter='0x3c41ff6b5845e0094e19888cba63773591be9de59cafa9e582386f6af15dd490'

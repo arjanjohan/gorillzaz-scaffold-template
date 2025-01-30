@@ -1,11 +1,9 @@
+import { useMintStage } from "./useMintStage";
 import { AccountInfo } from "@aptos-labs/wallet-adapter-react";
-import { useView } from "~~/hooks/scaffold-move/useView";
-
-const MODULE_NAME = process.env.NEXT_PUBLIC_MODULE_NAME ?? "launchpad";
 
 interface MintStageProps {
   stageName: string;
-  collectionAddress: string;
+  collectionAddress: `0x${string}`;
   account?: AccountInfo;
   isMintEnabled: boolean;
   quantity: number;
@@ -19,37 +17,10 @@ export const MintStage = ({
   quantity = 0,
   onQuantityChange,
 }: MintStageProps) => {
-  const { data: isAllowlisted } = account
-    ? useView({
-        moduleName: MODULE_NAME,
-        functionName: "is_allowlisted",
-        args: [collectionAddress, stageName, account.address],
-      })
-    : { data: undefined };
+  const { data: mintData } = useMintStage(collectionAddress, stageName, account?.address as `0x${string}`);
 
-  const { data: price } = useView({
-    moduleName: MODULE_NAME,
-    functionName: "get_mint_fee",
-    args: [collectionAddress, stageName, 1],
-  });
-
-  const { data: walletLimit } = account
-    ? useView({
-        moduleName: MODULE_NAME,
-        functionName: "get_mint_balance",
-        args: [collectionAddress, stageName, account.address],
-      })
-    : { data: undefined };
-
-  console.log("WALLET LIMIT", walletLimit);
-
-  const { data: stageTimes } = useView({
-    moduleName: MODULE_NAME,
-    functionName: "get_mint_stage_start_and_end_time",
-    args: [collectionAddress, stageName],
-  });
-  const startTime = stageTimes ? stageTimes[0] : 0;
-  const endTime = stageTimes ? stageTimes[1] : 0;
+  const startTime = mintData?.stageTimes ? mintData?.stageTimes[0] : 0;
+  const endTime = mintData?.stageTimes ? mintData?.stageTimes[1] : 0;
   const stageStartTime = new Date(Number(startTime) * 1000);
   const stageEndTime = new Date(Number(endTime) * 1000);
   const now = new Date();
@@ -77,6 +48,8 @@ export const MintStage = ({
 
   const isActive = stageStatus === "PERMANENT" || stageStatus === "ACTIVE";
 
+  if (!mintData) return null;
+
   return (
     <div className={`space-y-4 ${!isActive ? "opacity-50" : ""}`}>
       <h3 className="text-xl uppercase">{stageName}</h3>
@@ -87,8 +60,8 @@ export const MintStage = ({
           <span className="border-t-2 mr-4 border-gray-300 pt-2">{stageStatusText}</span>
         </div>
         <div className="grid grid-cols-3 text-sm">
-          <span>{price} APT</span>
-          <span>{walletLimit > 0 || isAllowlisted ? walletLimit : "N/A"}</span>
+          <span>{(parseInt(mintData.mintFee) / Math.pow(10, 8)).toFixed(1)} APT</span>
+          <span>{mintData.mintBalance > 0 || mintData?.isAllowlisted ? mintData?.mintBalance : "N/A"}</span>
           <span>{StageTimeInfo.toLocaleString()}</span>
         </div>
       </div>
@@ -114,7 +87,11 @@ export const MintStage = ({
           min="0"
           disabled={!isActive}
         />
-        <button className="btn btn-square" onClick={() => onQuantityChange(Math.min(walletLimit, quantity + 1))} disabled={quantity >= walletLimit || !isActive}>
+        <button
+          className="btn btn-square"
+          onClick={() => onQuantityChange(Math.min(mintData.mintBalance, quantity + 1))}
+          disabled={quantity >= mintData.mintBalance || !isActive}
+        >
           +
         </button>
       </div>
