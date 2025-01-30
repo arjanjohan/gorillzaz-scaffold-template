@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { CollectionDetails } from "~~/hooks/nft-minting/useGetCollectionDetails";
+import { useLaunchpad } from "~~/hooks/nft-minting/useLaunchpad";
 import useSubmitTransaction from "~~/hooks/scaffold-move/useSubmitTransaction";
-import { useView } from "~~/hooks/scaffold-move/useView";
 
 const MODULE_NAME = process.env.NEXT_PUBLIC_MODULE_NAME ?? "launchpad";
 
@@ -12,22 +13,29 @@ interface MintOverviewProps {
 }
 
 const MintOverview = ({ collectionDetails, quantities }: MintOverviewProps) => {
+  const launchpad = useLaunchpad();
+  const [stagePrices, setStagePrices] = useState<{ [key: string]: number }>({});
+
   const totalQuantity = Object.values(quantities).reduce((sum, q) => sum + q, 0);
-  const collectionAddress = collectionDetails.collection_address;
+  const collectionAddress = collectionDetails.collection_address as `0x${string}`;
   const availableMints = collectionDetails?.max_supply - collectionDetails?.current_supply;
   const { submitTransaction } = useSubmitTransaction(MODULE_NAME);
 
-  // Get price for each stage
-  // TODO: this errors. Store the price per stage somewhere in storage instead. It is retrieved by the MintStage component.
-  const stagePrices = Object.keys(quantities).reduce<{ [key: string]: number }>((acc, stageName) => {
-    const { data: price } = useView({
-      moduleName: MODULE_NAME,
-      functionName: "get_mint_fee",
-      args: [collectionAddress, stageName, 1],
-    });
-    acc[stageName] = price || 0;
-    return acc;
-  }, {});
+  useEffect(() => {
+    const fetchStagePrices = async () => {
+      const stagePrices: { [key: string]: number } = {};
+      for (const stageName of Object.keys(quantities)) {
+        const stagePrice = await launchpad.view.get_mint_fee({
+          functionArguments: [collectionAddress, stageName, 1],
+          typeArguments: [],
+        });
+        stagePrices[stageName] = Number(stagePrice?.[0] ?? 0);
+      }
+      console.log(stagePrices);
+      setStagePrices(stagePrices);
+    };
+    fetchStagePrices();
+  }, []);
 
   const totalPrice =
     Object.entries(quantities).reduce((sum, [stageName, quantity]) => {
