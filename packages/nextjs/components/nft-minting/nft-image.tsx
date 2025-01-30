@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 
-interface MintNextProps {
+interface NftImageProps {
   imgUri: string;
 }
 
-const NftImage = ({ imgUri }: MintNextProps) => {
+const NftImage = ({ imgUri }: NftImageProps) => {
   return (
     <div className="w-full aspect-square relative rounded-xl overflow-hidden">
       <Image src={imgUri} alt="Collection Logo" fill className="rounded-xl object-contain bg-base-300 p-4" />

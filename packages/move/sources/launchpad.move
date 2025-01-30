@@ -54,6 +54,8 @@ module deployment_addr::launchpad_double_whitelist {
     const EONLY_ADMIN_CAN_CREATE_ALLOWLIST: u64 = 16;
     /// Only admin can modify allowlist
     const EONLY_ADMIN_CAN_MODIFY_ALLOWLIST: u64 = 17;
+    /// Only admin can reveal collection
+    const EONLY_ADMIN_CAN_REVEAL_COLLECTION: u64 = 18;
 
     /// Default to mint 0 amount to creator when creating collection
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
@@ -64,9 +66,9 @@ module deployment_addr::launchpad_double_whitelist {
     const ONE_HUNDRED_YEARS_IN_SECONDS: u64 = 100 * 365 * 24 * 60 * 60;
 
     /// Category for whitelist mint stage
-    const WHITELIST_MINT_STAGE_CATEGORY: vector<u8> = b"Whitelist mint stage";
+    const GUARANTEED_ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Guaranteed allowlist mint stage";
     /// Category for allowlist mint stage
-    const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
+    const FCFS_ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"FCFS allowlist mint stage";
     /// Category for public mint stage
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint stage";
 
@@ -80,16 +82,16 @@ module deployment_addr::launchpad_double_whitelist {
         description: String,
         uri: String,
         pre_mint_amount: Option<u64>,
-        whitelist_addresses: Option<vector<address>>,
-        whitelist_mint_limit_per_addr: Option<vector<u64>>,
-        whitelist_start_time: Option<u64>,
-        whitelist_end_time: Option<u64>,
-        whitelist_mint_fee_per_nft: Option<u64>,
-        allowlist_addresses: Option<vector<address>>,
-        allowlist_mint_limit_per_addr: Option<vector<u64>>,
-        allowlist_start_time: Option<u64>,
-        allowlist_end_time: Option<u64>,
-        allowlist_mint_fee_per_nft: Option<u64>,
+        guaranteed_allowlist_addresses: Option<vector<address>>,
+        guaranteed_allowlist_mint_limit_per_addr: Option<vector<u64>>,
+        guaranteed_allowlist_start_time: Option<u64>,
+        guaranteed_allowlist_end_time: Option<u64>,
+        guaranteed_allowlist_mint_fee_per_nft: Option<u64>,
+        fcfs_allowlist_addresses: Option<vector<address>>,
+        fcfs_allowlist_mint_limit_per_addr: Option<vector<u64>>,
+        fcfs_allowlist_start_time: Option<u64>,
+        fcfs_allowlist_end_time: Option<u64>,
+        fcfs_allowlist_mint_fee_per_nft: Option<u64>,
         public_mint_start_time: Option<u64>,
         public_mint_end_time: Option<u64>,
         public_mint_limit_per_addr: Option<u64>,
@@ -212,18 +214,18 @@ module deployment_addr::launchpad_double_whitelist {
         royalty_percentage: Option<u64>,
         // Pre mint amount to creator
         pre_mint_amount: Option<u64>,
-        // Whitelist of addresses that can mint NFTs in whitelist stage
-        whitelist_addresses: Option<vector<address>>,
-        whitelist_mint_limit_per_addr: Option<vector<u64>>,
-        whitelist_start_time: Option<u64>,
-        whitelist_end_time: Option<u64>,
-        whitelist_mint_fee_per_nft: Option<u64>,
+        // Guaranteed allowlist of addresses that can mint NFTs in guaranteed_allowlist stage
+        guaranteed_allowlist_addresses: Option<vector<address>>,
+        guaranteed_allowlist_mint_limit_per_addr: Option<vector<u64>>,
+        guaranteed_allowlist_start_time: Option<u64>,
+        guaranteed_allowlist_end_time: Option<u64>,
+        guaranteed_allowlist_mint_fee_per_nft: Option<u64>,
         // Allowlist of addresses that can mint NFTs in allowlist stage
-        allowlist_addresses: Option<vector<address>>,
-        allowlist_mint_limit_per_addr: Option<vector<u64>>,
-        allowlist_start_time: Option<u64>,
-        allowlist_end_time: Option<u64>,
-        allowlist_mint_fee_per_nft: Option<u64>,
+        fcfs_allowlist_addresses: Option<vector<address>>,
+        fcfs_allowlist_mint_limit_per_addr: Option<vector<u64>>,
+        fcfs_allowlist_start_time: Option<u64>,
+        fcfs_allowlist_end_time: Option<u64>,
+        fcfs_allowlist_mint_fee_per_nft: Option<u64>,
         public_mint_start_time: Option<u64>,
         public_mint_end_time: Option<u64>,
         // Public mint limit per address
@@ -270,38 +272,38 @@ module deployment_addr::launchpad_double_whitelist {
         });
 
         assert!(
-            option::is_some(&allowlist_addresses) || option::is_some(&whitelist_addresses) || option::is_some(&public_mint_start_time),
+            option::is_some(&fcfs_allowlist_addresses) || option::is_some(&guaranteed_allowlist_addresses) || option::is_some(&public_mint_start_time),
             EAT_LEAST_ONE_STAGE_IS_REQUIRED
         );
 
-        if (option::is_some(&allowlist_addresses)) {
+        if (option::is_some(&fcfs_allowlist_addresses)) {
             add_mint_stage(
                 collection_obj,
                 collection_obj_addr,
                 collection_obj_signer,
                 collection_owner_obj_signer,
-                string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY),
-                *option::borrow(&allowlist_addresses),
-                *option::borrow(&allowlist_mint_limit_per_addr),
-                allowlist_start_time,
-                allowlist_end_time,
-                allowlist_mint_fee_per_nft,
+                string::utf8(FCFS_ALLOWLIST_MINT_STAGE_CATEGORY),
+                *option::borrow(&fcfs_allowlist_addresses),
+                *option::borrow(&fcfs_allowlist_mint_limit_per_addr),
+                fcfs_allowlist_start_time,
+                fcfs_allowlist_end_time,
+                fcfs_allowlist_mint_fee_per_nft,
             );
         };
 
 
-        if (option::is_some(&whitelist_addresses)) {
+        if (option::is_some(&guaranteed_allowlist_addresses)) {
             add_mint_stage(
                 collection_obj,
                 collection_obj_addr,
                 collection_obj_signer,
                 collection_owner_obj_signer,
-                string::utf8(WHITELIST_MINT_STAGE_CATEGORY),
-                *option::borrow(&whitelist_addresses),
-                *option::borrow(&whitelist_mint_limit_per_addr),
-                whitelist_start_time,
-                whitelist_end_time,
-                whitelist_mint_fee_per_nft,
+                string::utf8(GUARANTEED_ALLOWLIST_MINT_STAGE_CATEGORY),
+                *option::borrow(&guaranteed_allowlist_addresses),
+                *option::borrow(&guaranteed_allowlist_mint_limit_per_addr),
+                guaranteed_allowlist_start_time,
+                guaranteed_allowlist_end_time,
+                guaranteed_allowlist_mint_fee_per_nft,
             );
         };
 
@@ -330,16 +332,16 @@ module deployment_addr::launchpad_double_whitelist {
             description,
             uri,
             pre_mint_amount,
-            whitelist_addresses,
-            whitelist_mint_limit_per_addr,
-            whitelist_start_time,
-            whitelist_end_time,
-            whitelist_mint_fee_per_nft,
-            allowlist_addresses,
-            allowlist_mint_limit_per_addr,
-            allowlist_start_time,
-            allowlist_end_time,
-            allowlist_mint_fee_per_nft,
+            guaranteed_allowlist_addresses,
+            guaranteed_allowlist_mint_limit_per_addr,
+            guaranteed_allowlist_start_time,
+            guaranteed_allowlist_end_time,
+            guaranteed_allowlist_mint_fee_per_nft,
+            fcfs_allowlist_addresses,
+            fcfs_allowlist_mint_limit_per_addr,
+            fcfs_allowlist_start_time,
+            fcfs_allowlist_end_time,
+            fcfs_allowlist_mint_fee_per_nft,
             public_mint_start_time,
             public_mint_end_time,
             public_mint_limit_per_addr,
@@ -392,6 +394,39 @@ module deployment_addr::launchpad_double_whitelist {
         });
     }
 
+    public entry fun reveal_nft(
+        sender: &signer,
+        collection_obj: Object<Collection>,
+        nft_obj: Object<Token>,
+        name: String,
+        description: String,
+        uri: String,
+        prop_names: vector<String>,
+        prop_values: vector<String>
+    ) acquires CollectionOwnerObjConfig, CollectionConfig, Config {
+        let config = borrow_global_mut<Config>(@deployment_addr);
+        let sender_addr = signer::address_of(sender);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_REVEAL_COLLECTION);
+
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
+
+        token_components::set_name(collection_owner_obj_signer, nft_obj, name);
+        token_components::set_description(collection_owner_obj_signer, nft_obj, description);
+        token_components::set_uri(collection_owner_obj_signer, nft_obj, uri);
+
+        for (i in 0..vector::length(&prop_names)) {
+            let prop_name = *vector::borrow(&prop_names, i);
+            let prop_value = *vector::borrow(&prop_values, i);
+            // Check if the property already exists
+            if (aptos_token_objects::property_map::contains_key(&nft_obj, &prop_name)) {
+                token_components::update_typed_property(collection_owner_obj_signer, nft_obj, prop_name, prop_value);
+            } else {
+                token_components::add_typed_property(collection_owner_obj_signer, nft_obj, prop_name, prop_value);
+            }
+        };
+
+    }
+
     // ================================= View  ================================= //
 
     #[view]
@@ -423,10 +458,17 @@ module deployment_addr::launchpad_double_whitelist {
     }
 
     #[view]
-    /// Get all collections created using this contract
-    public fun get_registry(): vector<Object<Collection>> acquires Registry {
+    /// Get all collections created using this contract where mint is enabled
+    public fun get_registry(): vector<Object<Collection>> acquires Registry, CollectionConfig {
         let registry = borrow_global<Registry>(@deployment_addr);
-        registry.collection_objects
+        let collections = vector[];
+        for (i in 0..vector::length(&registry.collection_objects)) {
+            let collection_obj = *vector::borrow(&registry.collection_objects, i);
+            if (is_mint_enabled(collection_obj)) {
+                vector::push_back(&mut collections, collection_obj);
+            }
+        };
+        collections
     }
 
     #[view]
@@ -454,7 +496,7 @@ module deployment_addr::launchpad_double_whitelist {
     /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
     public fun get_mint_balance(collection_obj: Object<Collection>, stage_name: String, user_addr: address): u64 {
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
-        if (stage_name == string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY) || stage_name == string::utf8(WHITELIST_MINT_STAGE_CATEGORY)) {
+        if (stage_name == string::utf8(FCFS_ALLOWLIST_MINT_STAGE_CATEGORY) || stage_name == string::utf8(GUARANTEED_ALLOWLIST_MINT_STAGE_CATEGORY)) {
             mint_stage::allowlist_balance(collection_obj, stage_idx, user_addr)
         } else {
             mint_stage::public_stage_with_limit_user_balance(collection_obj, stage_idx, user_addr)
@@ -513,6 +555,15 @@ module deployment_addr::launchpad_double_whitelist {
         sender == config.creator_addr
     }
 
+    /// Gets the collection owner signer from a collection object
+    fun get_collection_owner_signer(collection_obj: &Object<Collection>): signer acquires CollectionConfig, CollectionOwnerObjConfig {
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(collection_obj));
+        let collection_owner_obj = collection_config.collection_owner_obj;
+        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
+            object::object_address(&collection_owner_obj)
+        );
+        object::generate_signer_for_extending(&collection_owner_config.extend_ref)
+    }
 
     /// Add mint stage
     fun add_mint_stage(
@@ -625,13 +676,7 @@ module deployment_addr::launchpad_double_whitelist {
         sender_addr: address,
         collection_obj: Object<Collection>,
     ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-
-        let collection_owner_obj = collection_config.collection_owner_obj;
-        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
-            object::object_address(&collection_owner_obj)
-        );
-        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
 
         let next_nft_id = *option::borrow(&collection::count(collection_obj)) + 1;
 
@@ -658,14 +703,14 @@ module deployment_addr::launchpad_double_whitelist {
     /// Construct NFT metadata URI
     fun construct_nft_metadata_uri(
         collection_uri: &String,
-        next_nft_id: u64,
+        _next_nft_id: u64,
     ): String {
         let nft_metadata_uri = &mut string::sub_string(
             collection_uri,
             0,
             string::length(collection_uri) - string::length(&string::utf8(b"collection.json"))
         );
-        let nft_metadata_filename = string_utils::format1(&b"{}.json", next_nft_id);
+        let nft_metadata_filename =  string::utf8(b"placeholder.png");
         string::append(nft_metadata_uri, nft_metadata_filename);
         *nft_metadata_uri
     }
@@ -681,15 +726,14 @@ module deployment_addr::launchpad_double_whitelist {
     entry fun clear_allowlist(
         sender: &signer,
         collection_obj: Object<Collection>,
-        collection_obj_addr: address,
-        collection_obj_signer: &signer,
-        collection_owner_obj_signer: &signer,
         stage_name: String,
-    ) acquires Config {
+    ) acquires Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@deployment_addr);
         assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_MODIFY_ALLOWLIST);
         assert!(allowlist_exists(collection_obj, stage_name), EALLOWLIST_NOT_FOUND);
+
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
 
         mint_stage::clear_allowlist(
             collection_owner_obj_signer,
@@ -702,19 +746,18 @@ module deployment_addr::launchpad_double_whitelist {
     entry fun update_allowlist(
         sender: &signer,
         collection_obj: Object<Collection>,
-        collection_obj_addr: address,
-        collection_obj_signer: &signer,
-        collection_owner_obj_signer: &signer,
         stage_name: String,
         allowlist_addresses: vector<address>,
         allowlist_mint_limit_per_addr: vector<u64>
-    ) acquires Config {
+    ) acquires Config, CollectionConfig, CollectionOwnerObjConfig {
         let sender_addr = signer::address_of(sender);
         let config = borrow_global<Config>(@deployment_addr);
         assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_MODIFY_ALLOWLIST);
         assert!(allowlist_exists(collection_obj, stage_name), EALLOWLIST_NOT_FOUND);
         assert!(vector::length(&allowlist_addresses) == vector::length(&allowlist_mint_limit_per_addr), EALLOWLIST_AND_MINT_LIMIT_PER_ADDR_MUST_BE_SAME_LENGTH);
 
+        let collection_owner_obj_signer = &get_collection_owner_signer(&collection_obj);
+        
         for (i in 0..vector::length(&allowlist_addresses)) {
             let mint_limit = *vector::borrow(&allowlist_mint_limit_per_addr, i);
             if (mint_limit > 0) {
@@ -738,8 +781,8 @@ module deployment_addr::launchpad_double_whitelist {
 
     // ================================= Allowlist checker ================================== //
 
-    /// Check if user is allowlisted for a specific stage
     #[view]
+    /// Check if user is allowlisted for a specific stage
     public fun is_allowlisted(collection_obj: Object<Collection>, stage_name: String, user_addr: address): bool {
         let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
         mint_stage::is_allowlisted(collection_obj, stage_idx, user_addr)
@@ -751,5 +794,12 @@ module deployment_addr::launchpad_double_whitelist {
     #[test_only]
     public fun init_module_for_test(sender: &signer) {
         init_module(sender);
+    }
+
+    #[test_only]
+    public fun test_mint_nft(sender_addr: address, collection_obj: Object<Collection>): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
+        let nft = mint_nft_internal(sender_addr, collection_obj);
+
+        nft
     }
 }
