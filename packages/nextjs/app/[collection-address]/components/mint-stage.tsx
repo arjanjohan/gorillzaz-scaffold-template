@@ -60,7 +60,7 @@ export const MintStage = ({
           <span className="border-t-2 mr-4 border-gray-300 pt-2">{stageStatusText}</span>
         </div>
         <div className="grid grid-cols-3 text-sm">
-          <span>{mintData.mintFee} APT</span>
+          <span>{(parseInt(mintData.mintFee) / Math.pow(10, 8)).toFixed(1)} APT</span>
           <span>{mintData.mintBalance > 0 || mintData?.isAllowlisted ? mintData?.mintBalance : "N/A"}</span>
           <span>{StageTimeInfo.toLocaleString()}</span>
         </div>

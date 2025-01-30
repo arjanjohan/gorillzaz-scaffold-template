@@ -29,9 +29,10 @@ const MintOverview = ({ collectionDetails, quantities }: MintOverviewProps) => {
     return acc;
   }, {});
 
-  const totalPrice = Object.entries(quantities).reduce((sum, [stageName, quantity]) => {
-    return sum + quantity * (stagePrices[stageName] || 0);
-  }, 0);
+  const totalPrice =
+    Object.entries(quantities).reduce((sum, [stageName, quantity]) => {
+      return sum + quantity * (stagePrices[stageName] || 0);
+    }, 0) / Math.pow(10, 8);
 
   const handleMint = async () => {
     if (!totalQuantity) return;
@@ -61,7 +62,7 @@ const MintOverview = ({ collectionDetails, quantities }: MintOverviewProps) => {
               <span>{stageName}</span>
               <div className="flex gap-8">
                 <span>x{qty}</span>
-                <span>{(qty * (stagePrices[stageName] || 0)).toFixed(4)} APT</span>
+                <span>{((qty * (stagePrices[stageName] || 0)) / Math.pow(10, 8)).toFixed(1)} APT</span>
               </div>
             </div>
           ),
@@ -72,7 +73,7 @@ const MintOverview = ({ collectionDetails, quantities }: MintOverviewProps) => {
           <span>TOTAL →</span>
           <div className="flex gap-8">
             <span>x{totalQuantity}</span>
-            <span>{totalPrice.toFixed(4)} APT</span>
+            <span>{totalPrice.toFixed(1)} APT</span>
           </div>
         </div>
       </div>

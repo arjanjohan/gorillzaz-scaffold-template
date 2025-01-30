@@ -38,8 +38,8 @@ export function parseYaml(filePath: string) {
   return yaml.load(yamlContent) as any;
 }
 
-export function convertToAmount(amount: number) {
-  return amount * Math.pow(10, 9);
+export function convertToAmount(amount: number, decimals: number) {
+  return amount * Math.pow(10, decimals);
 }
 
 export function dateToSeconds(date: Date | undefined) {

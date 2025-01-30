@@ -18,8 +18,8 @@ module deployment_addr::test_end_to_end {
     use deployment_addr::launchpad_double_whitelist;
 
     /// Category for allowlist mint stage
-    const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
-    const WHITELIST_MINT_STAGE_CATEGORY: vector<u8> = b"Whitelist mint stage";
+    const FCFS_ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"FCFS allowlist mint stage";
+    const GUARANTEED_ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Guaranteed allowlist mint stage";
 
     /// Category for public mint stage
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint stage";
@@ -73,16 +73,16 @@ module deployment_addr::test_end_to_end {
         let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
         assert!(collection::count(collection_1) == option::some(3), 1);
 
-        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
+        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(FCFS_ALLOWLIST_MINT_STAGE_CATEGORY), 1);
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         launchpad_double_whitelist::mint_nft(user1, collection_1, 1);
 
         let active_or_next_stage = launchpad_double_whitelist::get_active_or_next_mint_stage(collection_1);
-        assert!(active_or_next_stage == option::some(string::utf8(WHITELIST_MINT_STAGE_CATEGORY)), 3);
+        assert!(active_or_next_stage == option::some(string::utf8(GUARANTEED_ALLOWLIST_MINT_STAGE_CATEGORY)), 3);
         let (start_time, end_time) = launchpad_double_whitelist::get_mint_stage_start_and_end_time(
             collection_1,
-            string::utf8(WHITELIST_MINT_STAGE_CATEGORY)
+            string::utf8(GUARANTEED_ALLOWLIST_MINT_STAGE_CATEGORY)
         );
         assert!(start_time == 0, 4);
         assert!(end_time == 100, 5);
@@ -167,7 +167,7 @@ module deployment_addr::test_end_to_end {
 
         assert!(launchpad_double_whitelist::is_mint_enabled(collection_1), 1);
 
-        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
+        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(FCFS_ALLOWLIST_MINT_STAGE_CATEGORY), 1);
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         launchpad_double_whitelist::mint_nft(user1, collection_1, 1);
@@ -229,7 +229,7 @@ module deployment_addr::test_end_to_end {
 
         assert!(launchpad_double_whitelist::is_mint_enabled(collection_1), 1);
 
-        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY), 1);
+        let mint_fee = launchpad_double_whitelist::get_mint_fee(collection_1, string::utf8(FCFS_ALLOWLIST_MINT_STAGE_CATEGORY), 1);
         aptos_coin::mint(aptos_framework, user1_addr, mint_fee);
 
         let nft_obj = launchpad_double_whitelist::test_mint_nft(user1_addr, collection_1);
