@@ -7,6 +7,8 @@ interface NftImageProps {
 }
 
 const NftImage = ({ imgUri }: NftImageProps) => {
+  if (!imgUri) return null;
+
   return (
     <div className="w-full aspect-square relative rounded-xl overflow-hidden">
       <Image src={imgUri} alt="Collection Logo" fill className="rounded-xl object-contain bg-base-300 p-4" />

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { CustomConnectButton } from "~~/components/scaffold-move";
+import { COLLECTION_ID } from "~~/env";
 import { useOutsideClick } from "~~/hooks/scaffold-move";
 
 type HeaderMenuLink = {
@@ -21,7 +22,7 @@ export const menuLinks: HeaderMenuLink[] = [
   },
   {
     label: "Mint",
-    href: "/0xb157c9636dc18c8bfeb07ab0c6a30d4b0e75f70b9ddbf6b8efc4ad8ef2f84755",
+    href: "/" + COLLECTION_ID,
   },
   {
     label: "My NFTs",

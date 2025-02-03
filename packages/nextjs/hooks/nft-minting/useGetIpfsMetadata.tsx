@@ -8,7 +8,7 @@ export function useGetIpfsMetadata<T = any>(ipfsHash: string): UseQueryResult<T,
     queryFn: async () => {
       try {
         const metadata = await getIpfsMetadata(ipfsHash);
-        return metadata;
+        return metadata ?? null;
       } catch (error) {
         console.error("Error fetching metadata:", error);
         return null;
