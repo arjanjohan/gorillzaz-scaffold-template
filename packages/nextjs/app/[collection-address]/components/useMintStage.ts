@@ -12,7 +12,9 @@ export function useMintStage(
     queryKey: ["mintStage", collectionAddress, stageName, accountAddress],
     queryFn: async () => {
       let isAllowlisted = false;
-      if (accountAddress) {
+      if (stageName === "Public mint stage") {
+        isAllowlisted = true;
+      } else if (accountAddress) {
         try {
           isAllowlisted = (
             await launchpad.view.is_allowlisted({

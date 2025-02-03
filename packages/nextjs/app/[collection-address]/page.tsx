@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { NextPage } from "next";
 import NftImage from "~~/components/nft-minting/nft-image";
 import { Address } from "~~/components/scaffold-move/Address";
+import { MINT_PAGE_ENABLED } from "~~/env";
 import { useGetCollectionDetails } from "~~/hooks/nft-minting/useGetCollectionDetails";
 import { useLaunchpad } from "~~/hooks/nft-minting/useLaunchpad";
 import { useMintStages } from "~~/hooks/nft-minting/useMintStages";
@@ -54,6 +55,15 @@ const CollectionDetailsPage: NextPage = () => {
   const handleQuantityChange = (stageName: string, quantity: number) => {
     setQuantities(prev => ({ ...prev, [stageName]: quantity }));
   };
+
+  if (!MINT_PAGE_ENABLED) {
+    return (
+      <div className="container mx-auto p-8">
+        <div className="text-2xl font-bold mb-4">Mint page not yet enabled</div>
+        <div className="text-sm">This page is not yet enabled. Please check back later.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-8">
