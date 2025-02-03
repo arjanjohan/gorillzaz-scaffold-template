@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import type { NextPage } from "next";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { COLLECTION_ID } from "~~/env";
 
 const Home: NextPage = () => {
   return (
@@ -19,25 +21,11 @@ const Home: NextPage = () => {
             <div className="flex items-center gap-6 w-full bg-base-100 p-6 rounded-xl">
               <DocumentDuplicateIcon className="h-12 w-12 flex-shrink-0 text-primary" />
               <div>
-                <h2 className="text-xl font-bold mb-2">1. Fork and Setup (Optional)</h2>
+                <h2 className="text-xl font-bold mb-2">WL Checker</h2>
                 <p>
-                  Start by forking the{" "}
-                  <a
-                    href="https://github.com/arjanjohan/scaffold-move/tree/nft-minting"
-                    className="link link-primary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    repository
-                  </a>{" "}
-                  and following the setup instructions in the README.
-                </p>
-                <pre className="mt-2 p-2 bg-base-200 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap">
-                  git clone --branch nft-minting --single-branch git@github.com:arjanjohan/scaffold-move.git
-                </pre>
-                <p>
-                  If you don&apos;t intend to modify the contract code, you can also use this website to create
-                  collections.
+                  <Link href={`${COLLECTION_ID}/checker`} className="link link-primary">
+                    See if you are on the WL
+                  </Link>{" "}
                 </p>
               </div>
             </div>
