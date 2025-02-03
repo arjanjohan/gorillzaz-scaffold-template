@@ -20,16 +20,20 @@ const CollectionDetailsPage: NextPage = () => {
 
   return (
     <div className="container mx-auto p-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {stages?.map((stageName: string, index: number) => (
-          <Stage
-            key={index}
-            collectionAddress={collectionAddress}
-            stageName={stageName}
-            accountAddress={account?.address}
-          />
-        ))}
-      </div>
+      {!account && <h1 className="text-xl font-bold mb-4">Connect your Wallet to see if you are on the WL!</h1>}
+
+      {account && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {stages?.map((stageName: string, index: number) => (
+            <Stage
+              key={index}
+              collectionAddress={collectionAddress}
+              stageName={stageName}
+              accountAddress={account?.address}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
