@@ -32,16 +32,16 @@ export const Stage = ({ collectionAddress, stageName, accountAddress }: StagePro
     args: [collectionAddress, stageIndex],
   });
 
+  if (!isStageAllowlisted) {
+    return null;
+  }
+
   return (
     <div className="card bg-base-200 shadow-xl p-6">
       <h2 className="text-xl font-bold mb-4">{stageName}</h2>
       <div className="space-y-2">
-        {isStageAllowlisted && (
-          <>
-            <p>{isAllowlisted ? "✅ Allowlisted" : "❌ Not Allowlisted"}</p>
-            {isAllowlisted && <p>Allocation: {allowlistBalance || 0}</p>}
-          </>
-        )}
+        <p>{isAllowlisted ? "✅ Allowlisted" : "❌ Not Allowlisted"}</p>
+        {isAllowlisted && <p>Allocation: {allowlistBalance || 0}</p>}
       </div>
     </div>
   );
