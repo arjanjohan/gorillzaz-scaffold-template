@@ -24,6 +24,7 @@ const launchpadClient = createSurfClient(aptosClient).useABI(deployedModules[2].
 
 async function main() {
   // await setupAllowlist();
+  /*
   const price = convertToAmount(1, 8);
   await createCollection({
     description: "GCC",
@@ -47,8 +48,10 @@ async function main() {
     public_mint_limit_per_addr: 1,
     public_mint_fee_per_nft: price,
   });
+  */
 
   // await reveal("0x7d78fc0346f44cd77a47eb09a0e3d9c7bbf358c2d6fe8828d62d32abcb6c6b65");
+  await updateMintFeeCollector("0x8e4e6dc2f0810d1863d2d676a2f28f346f40bbf2d047699be4b5fde537f491b0");
 }
 
 interface CreateCollectionParams {
@@ -184,6 +187,16 @@ async function reveal(collectionId: `0x${string}`) {
 
     console.log(`revealed ${i} of ${maxSupply}`);
   }
+}
+
+async function updateMintFeeCollector(mintFeeCollectorAddress: `0x${string}`) {
+  const response = (await launchpadClient.entry.update_mint_fee_collector({
+    account: admin,
+    typeArguments: [],
+    functionArguments: [mintFeeCollectorAddress],
+  })) as UserTransactionResponse;
+
+  console.log(response);
 }
 
 main();
