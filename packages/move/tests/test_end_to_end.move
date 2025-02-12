@@ -24,12 +24,13 @@ module deployment_addr::test_end_to_end {
     /// Category for public mint stage
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint stage";
 
-    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200, user2 = @0x201)]
+    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200, user2 = @0x201, royalty_user = @0x300)]
     fun test_happy_path(
         aptos_framework: &signer,
         sender: &signer,
         user1: &signer,
         user2: &signer,
+        royalty_user: &signer
     ) {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
@@ -50,6 +51,7 @@ module deployment_addr::test_end_to_end {
             string::utf8(b"name"),
             string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
             10,
+            signer::address_of(royalty_user),
             option::some(10),
             option::some(3),
             option::some(vector[user1_addr]),
@@ -118,12 +120,13 @@ module deployment_addr::test_end_to_end {
         coin::destroy_mint_cap(mint_cap);
     }
 
-    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200)]
+    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200, royalty_user = @0x300)]
     #[expected_failure(abort_code = 12, location = launchpad_double_whitelist)]
     fun test_mint_disabled(
         aptos_framework: &signer,
         sender: &signer,
         user1: &signer,
+        royalty_user: &signer
     ) {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
@@ -142,6 +145,7 @@ module deployment_addr::test_end_to_end {
             string::utf8(b"name"),
             string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
             10,
+            signer::address_of(royalty_user),
             option::some(10),
             option::some(3),
 
@@ -181,11 +185,12 @@ module deployment_addr::test_end_to_end {
         coin::destroy_mint_cap(mint_cap);
     }
 
-    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200)]
+    #[test(aptos_framework = @0x1, sender = @deployment_addr, user1 = @0x200, royalty_user = @0x300)]
     fun test_should_reveal_nft(
         aptos_framework: &signer,
         sender: &signer,
         user1: &signer,
+        royalty_user: &signer
     ) {
         let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(aptos_framework);
 
@@ -204,6 +209,7 @@ module deployment_addr::test_end_to_end {
             string::utf8(b"collection name"),
             string::utf8(b"https://gateway.irys.xyz/manifest_id/collection.json"),
             10,
+            signer::address_of(royalty_user),
             option::some(10),
             option::some(3),
 

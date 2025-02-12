@@ -211,6 +211,7 @@ module deployment_addr::launchpad_double_whitelist {
         name: String,
         uri: String,
         max_supply: u64,
+        royalty_address: address,
         royalty_percentage: Option<u64>,
         // Pre mint amount to creator
         pre_mint_amount: Option<u64>,
@@ -239,7 +240,7 @@ module deployment_addr::launchpad_double_whitelist {
             EONLY_ADMIN_OR_CREATOR_CAN_CREATE_COLLECTION
         );
 
-        let royalty = royalty(&mut royalty_percentage, sender_addr);
+        let royalty = royalty(&mut royalty_percentage, royalty_address);
 
         let collection_owner_obj_constructor_ref = &object::create_object(@deployment_addr);
         let collection_owner_obj_signer = &object::generate_signer(collection_owner_obj_constructor_ref);
