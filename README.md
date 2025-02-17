@@ -1,6 +1,6 @@
 NFT Template for minting, based on the aptos launchpad.move.
 
-Launchpad has 2 allowlist stages and a public mint stage. 
+Launchpad has 2 allowlist stages and a public mint stage.
 
 ## Requirements
 
@@ -29,7 +29,7 @@ yarn install
 yarn account
 ```
 
-This command overwrites `packages/move/.aptos/config.yaml` with a new Aptos account. The new address is copied over to the first address in the Move.toml file. If no address exists in this file, it is added on a new line.
+This command overwrites `packages/move/.movement/config.yaml` with a new Aptos account. The new address is copied over to the first address in the Move.toml file. If no address exists in this file, it is added on a new line.
 
 3. Deploy the launchpad module:
 
@@ -50,7 +50,9 @@ Visit your app on: `http://localhost:3000`. You can interact with your Move modu
 5. Deploy to Vercel
 
 After you made your changes and are happy with the app, it's time to publish it for the world. Use this command to deploy it to vercel:
+
 ```
 yarn vercel
 ```
+
 Follow the instructions on screen. Use `--prod` to deploy directly to production. If you want to deploy and ignore any warnings, use `yarn vercel:yolo` instead.

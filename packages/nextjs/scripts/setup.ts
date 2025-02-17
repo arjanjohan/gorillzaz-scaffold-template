@@ -8,19 +8,19 @@ import { Network } from "aptos";
 import fs from "fs";
 import path from "path";
 
-const configYamlPath = path.join(__dirname, "../../move/.aptos/config.yaml");
+const configYamlPath = path.join(__dirname, "../../move/.movement/config.yaml");
 
 const config = parseYaml(configYamlPath) as any;
-const nodeUrl = config.profiles.default.rest_url + "/v1";
+const nodeUrl = config.profiles.default.rest_url;
 const accountAddress = config.profiles.default.account.replace(/^0x/, ""); // Strip 0x from the account address
 
 const admin = getSigner(configYamlPath);
 const { aptosClient } = getAptosClient(
-  Network.TESTNET,
+  "custom" as Network,
   nodeUrl,
-  "https://api.testnet.staging.aptoslabs.com/v1/graphql",
+  "https://indexer.testnet.movementnetwork.xyz/v1/graphql",
 );
-const launchpadClient = createSurfClient(aptosClient).useABI(deployedModules[2].launchpad_double_whitelist.abi);
+const launchpadClient = createSurfClient(aptosClient).useABI(deployedModules[250].launchpad_double_whitelist.abi);
 
 async function main() {
   // await setupAllowlist();
@@ -31,27 +31,28 @@ async function main() {
     name: "GCC",
     uri: "ipfs://bafybeicwslqt67huigwnx525j2gdb2maeyhdnp4dhhouxcckkeld4sk47u/collection.json",
     max_supply: 3000,
+    royalty_address: admin.accountAddress.toString(),
     royalty_percentage: 5,
     pre_mint_amount: 200,
     guaranteed_allowlist_addresses: [admin.accountAddress.toString()],
     guaranteed_allowlist_mint_limit_per_addr: [1],
-    guaranteed_allowlist_start_time: new Date(2025, 1, 3, 0, 0, 0).getTime() / 1000,
-    guaranteed_allowlist_end_time: new Date(2025, 1, 4, 0, 0, 0).getTime() / 1000,
+    guaranteed_allowlist_start_time: new Date(2025, 1, 16, 0, 0, 0).getTime() / 1000,
+    guaranteed_allowlist_end_time: new Date(2025, 1, 17, 0, 0, 0).getTime() / 1000,
     guaranteed_allowlist_mint_fee_per_nft: price,
     fcfs_allowlist_addresses: [admin.accountAddress.toString()],
     fcfs_allowlist_mint_limit_per_addr: [1],
-    fcfs_allowlist_start_time: new Date(2025, 1, 4, 0, 0, 0).getTime() / 1000,
-    fcfs_allowlist_end_time: new Date(2025, 1, 5, 0, 0, 0).getTime() / 1000,
+    fcfs_allowlist_start_time: new Date(2025, 1, 17, 0, 0, 0).getTime() / 1000,
+    fcfs_allowlist_end_time: new Date(2025, 1, 18, 0, 0, 0).getTime() / 1000,
     fcfs_allowlist_mint_fee_per_nft: price,
-    public_mint_start_time: new Date(2025, 1, 5, 0, 0, 0).getTime() / 1000,
-    public_mint_end_time: new Date(2025, 1, 6, 0, 0, 0).getTime() / 1000,
+    public_mint_start_time: new Date(2025, 1, 18, 0, 0, 0).getTime() / 1000,
+    public_mint_end_time: new Date(2025, 1, 19, 0, 0, 0).getTime() / 1000,
     public_mint_limit_per_addr: 1,
     public_mint_fee_per_nft: price,
   });
   */
 
-  // await reveal("0x7d78fc0346f44cd77a47eb09a0e3d9c7bbf358c2d6fe8828d62d32abcb6c6b65");
-  await updateMintFeeCollector("0x8e4e6dc2f0810d1863d2d676a2f28f346f40bbf2d047699be4b5fde537f491b0");
+  await reveal("0xfe0ae77d1e0ed30af7a56d64bbc872f6edecf0722a51867b67088f25d2bcc03b");
+  // await updateMintFeeCollector("0x8e4e6dc2f0810d1863d2d676a2f28f346f40bbf2d047699be4b5fde537f491b0");
 }
 
 interface CreateCollectionParams {
@@ -59,6 +60,7 @@ interface CreateCollectionParams {
   name: string;
   uri: string;
   max_supply: number;
+  royalty_address: `0x${string}`;
   royalty_percentage: number | undefined;
   // Pre mint amount to creator
   pre_mint_amount: number | undefined;
@@ -90,6 +92,7 @@ async function createCollection(params: CreateCollectionParams) {
       params.name,
       params.uri,
       params.max_supply,
+      params.royalty_address,
       params.royalty_percentage,
       params.pre_mint_amount,
       params.guaranteed_allowlist_addresses,

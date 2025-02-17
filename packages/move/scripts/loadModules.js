@@ -1,27 +1,35 @@
-const fs = require('fs');
-const path = require('path');
-const yaml = require('js-yaml');
-const { AptosClient } = require('aptos'); // Assuming you're using the Aptos SDK for JavaScript
-const axios = require('axios'); // Add axios to make HTTP requests
-const { loadExternalModules } = require('../move.config.ts'); // Import from move.config.ts
-const deploymentsDir = path.join(__dirname, '../deployments');
+const fs = require("fs");
+const path = require("path");
+const yaml = require("js-yaml");
+const { AptosClient } = require("aptos"); // Assuming you're using the Aptos SDK for JavaScript
+const axios = require("axios"); // Add axios to make HTTP requests
+const { loadExternalModules } = require("../move.config.ts"); // Import from move.config.ts
+const deploymentsDir = path.join(__dirname, "../deployments");
 
 // Paths to the relevant files
-const moveTomlPath = path.join(__dirname, '../Move.toml');
-const configYamlPath = path.join(__dirname, '../.aptos/config.yaml');
-const deployedModulesPath = path.join(__dirname, '../../../packages/nextjs/modules/deployedModules.ts');
-const externalModulesPath = path.join(__dirname, '../../../packages/nextjs/modules/externalModules.ts');
+const moveTomlPath = path.join(__dirname, "../Move.toml");
+const configYamlPath = path.join(__dirname, "../.movement/config.yaml");
+const deployedModulesPath = path.join(
+  __dirname,
+  "../../../packages/nextjs/modules/deployedModules.ts"
+);
+const externalModulesPath = path.join(
+  __dirname,
+  "../../../packages/nextjs/modules/externalModules.ts"
+);
 
 // Function to parse the TOML file and extract addresses
 function parseToml(filePath) {
-  const toml = fs.readFileSync(filePath, 'utf-8');
+  const toml = fs.readFileSync(filePath, "utf-8");
   const addressesSection = toml.match(/\[addresses\]([\s\S]*?)(?=\[|$)/);
   if (addressesSection) {
     const addresses = {};
-    const lines = addressesSection[1].trim().split('\n');
-    lines.forEach(line => {
-      const [key, value] = line.split('=').map(part => part.trim().replace(/['"]+/g, ''));
-      addresses[key] = value.replace(/^0x/, ''); // Strip 0x from the address
+    const lines = addressesSection[1].trim().split("\n");
+    lines.forEach((line) => {
+      const [key, value] = line
+        .split("=")
+        .map((part) => part.trim().replace(/['"]+/g, ""));
+      addresses[key] = value.replace(/^0x/, ""); // Strip 0x from the address
     });
     return addresses;
   }
@@ -30,7 +38,7 @@ function parseToml(filePath) {
 
 // Function to parse the YAML config file
 function parseYaml(filePath) {
-  const yamlContent = fs.readFileSync(filePath, 'utf-8');
+  const yamlContent = fs.readFileSync(filePath, "utf-8");
   return yaml.load(yamlContent);
 }
 
@@ -60,7 +68,7 @@ async function fetchChainId(nodeUrl) {
 // Function to get existing module data
 function getExistingModulesData(filePath) {
   if (fs.existsSync(filePath)) {
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const fileContent = fs.readFileSync(filePath, "utf-8");
     const match = fileContent.match(/deployedModules\s*=\s*({[\s\S]*});/);
     if (match && match[1]) {
       return JSON.parse(match[1]);
@@ -76,18 +84,18 @@ function writeChainModules(chainId, modules, isDeployed) {
     fs.mkdirSync(chainDir, { recursive: true });
   }
 
-  const fileName = isDeployed ? 'deployedModules.json' : 'externalModules.json';
+  const fileName = isDeployed ? "deployedModules.json" : "externalModules.json";
   const filePath = path.join(chainDir, fileName);
 
   const moduleData = modules.reduce((acc, module) => {
     acc[module.abi.name] = {
       bytecode: module.bytecode,
-      abi: module.abi
+      abi: module.abi,
     };
     return acc;
   }, {});
 
-  fs.writeFileSync(filePath, JSON.stringify(moduleData, null, 2), 'utf-8');
+  fs.writeFileSync(filePath, JSON.stringify(moduleData, null, 2), "utf-8");
 }
 
 // Updated writeModules function
@@ -95,10 +103,16 @@ function writeModules(filePath, variableName) {
   const allChainDirs = fs.readdirSync(deploymentsDir);
   const allModules = {};
 
-  allChainDirs.forEach(chainDir => {
-    const chainModulesPath = path.join(deploymentsDir, chainDir, `${variableName}.json`);
+  allChainDirs.forEach((chainDir) => {
+    const chainModulesPath = path.join(
+      deploymentsDir,
+      chainDir,
+      `${variableName}.json`
+    );
     if (fs.existsSync(chainModulesPath)) {
-      const chainModules = JSON.parse(fs.readFileSync(chainModulesPath, 'utf-8'));
+      const chainModules = JSON.parse(
+        fs.readFileSync(chainModulesPath, "utf-8")
+      );
       allModules[chainDir] = chainModules;
     }
   });
@@ -113,21 +127,25 @@ function writeModules(filePath, variableName) {
 
   const ${variableName} = {
     ${Object.entries(allModules).reduce((content, [chainId, chainConfig]) => {
-      return `${content}${parseInt(chainId).toFixed(0)}:${JSON.stringify(chainConfig, null, 2)},`;
-    }, '')}
+      return `${content}${parseInt(chainId).toFixed(0)}:${JSON.stringify(
+        chainConfig,
+        null,
+        2
+      )},`;
+    }, "")}
   } as const;
 
   export default ${variableName} satisfies GenericModulesDeclaration;
   `;
 
-  fs.writeFileSync(filePath, fileContent.trim(), 'utf-8');
-  }
+  fs.writeFileSync(filePath, fileContent.trim(), "utf-8");
+}
 
 // Main function to perform the tasks
 async function main() {
   const config = parseYaml(configYamlPath);
   const nodeUrl = config.profiles.default.rest_url;
-  const accountAddress = config.profiles.default.account.replace(/^0x/, ''); // Strip 0x from the account address
+  const accountAddress = config.profiles.default.account.replace(/^0x/, ""); // Strip 0x from the account address
 
   const addresses = parseToml(moveTomlPath);
 
@@ -145,15 +163,20 @@ async function main() {
   }
 
   // Fetch and save account modules for the account from config.yaml
-  const deployedModules = await getAccountModules({ address: accountAddress }, nodeUrl);
+  const deployedModules = await getAccountModules(
+    { address: accountAddress },
+    nodeUrl
+  );
   writeChainModules(chainId, deployedModules, true);
   writeModules(deployedModulesPath, "deployedModules");
-  console.log(`Data for deployed modules at address ${accountAddress} saved successfully.`);
+  console.log(
+    `Data for deployed modules at address ${accountAddress} saved successfully.`
+  );
 
   // Fetch and save account modules for each address from Move.toml, excluding the one from config.yaml
-  console.log('Data for external modules:', loadExternalModules);
+  console.log("Data for external modules:", loadExternalModules);
   if (loadExternalModules && addresses) {
-    console.log('Loading external modules...');
+    console.log("Loading external modules...");
     const externalModules = [];
     for (const [name, address] of Object.entries(addresses)) {
       if (address.toLowerCase() !== accountAddress.toLowerCase()) {

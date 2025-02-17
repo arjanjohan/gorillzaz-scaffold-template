@@ -8,5 +8,5 @@ export function useLaunchpad() {
   const aptosClient = useAptosClient(network.targetNetwork.id);
   const client = createSurfClient(aptosClient);
 
-  return client.useABI(deployedModules[2].launchpad_double_whitelist.abi);
+  return client.useABI(deployedModules[250].launchpad_double_whitelist.abi);
 }

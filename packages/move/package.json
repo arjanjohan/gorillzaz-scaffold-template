@@ -4,10 +4,10 @@
   "scripts": {
     "account": "node scripts/init-account.js",
     "chain": "aptos node run-local-testnet",
-    "deploy": "aptos move publish --assume-yes && node scripts/loadModules.js",
-    "publish": "aptos move publish --assume-yes && node scripts/loadModules.js",
-    "compile": "aptos move compile",
-    "test": "aptos move test"
+    "deploy": "movement move publish --assume-yes && node scripts/loadModules.js",
+    "publish": "movement move publish --assume-yes && node scripts/loadModules.js",
+    "compile": "movement move compile",
+    "test": "movement move test"
   },
   "dependencies": {
     "aptos": "^1.21.0",

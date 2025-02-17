@@ -19,6 +19,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "ipfs.io",
       },
+      {
+        protocol: "https",
+        hostname: "pinphweythafvrejqfgm.supabase.co",
+      },
     ],
   },
   webpack: config => {

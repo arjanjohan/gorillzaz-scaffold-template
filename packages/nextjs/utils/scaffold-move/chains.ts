@@ -55,7 +55,7 @@ export const defaultChains: Chains = {
     name: "Movement Bardock Testnet",
     network: Network.CUSTOM,
     fullnode: "https://aptos.testnet.bardock.movementlabs.xyz/v1",
-    indexer: "",
+    indexer: "https://indexer.testnet.movementnetwork.xyz/v1/graphql",
     faucet: "https://faucet.testnet.bardock.movementnetwork.xyz/",
     block_explorer: "https://explorer.movementnetwork.xyz",
     explorer_network_param: "testnet",

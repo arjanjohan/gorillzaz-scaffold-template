@@ -77,7 +77,12 @@ const MyNfts: NextPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {filteredNfts?.map((nft: any) => (
           <div key={`${nft.token_data_id}_${nft.current_token_data.collection_id}`}>
-            <NftItem tokenAddress={nft.token_data_id} collectionAddress={nft.current_token_data.collection_id} />
+            <NftItem
+              tokenAddress={nft.token_data_id}
+              collectionAddress={nft.current_token_data.collection_id}
+              name={nft.current_token_data.token_name}
+              image={nft.current_token_data.token_uri}
+            />
           </div>
         ))}
       </div>
