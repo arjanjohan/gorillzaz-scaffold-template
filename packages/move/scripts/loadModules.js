@@ -179,7 +179,10 @@ async function main() {
     console.log("Loading external modules...");
     const externalModules = [];
     for (const [name, address] of Object.entries(addresses)) {
-      if (address.toLowerCase() !== accountAddress.toLowerCase()) {
+      if (
+        address.toLowerCase() !== accountAddress.toLowerCase() ||
+        name === "minter" // TODO urslee: Remove this once we have minter deployed to another address
+      ) {
         const modules = await getAccountModules({ address }, nodeUrl);
         externalModules.push(...modules);
         console.log(`Data for address ${address} saved successfully.`);

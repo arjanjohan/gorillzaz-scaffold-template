@@ -8,5 +8,5 @@ export function useMintStages() {
   const aptosClient = useAptosClient(network.targetNetwork.id);
   const client = createSurfClient(aptosClient);
 
-  return client.useABI(externalModules[2].mint_stage.abi);
+  return client.useABI(externalModules[250].mint_stage.abi);
 }
