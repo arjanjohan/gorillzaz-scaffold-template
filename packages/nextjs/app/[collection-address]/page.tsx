@@ -12,8 +12,11 @@ import NftImage from "~~/components/nft-minting/nft-image";
 import { Address } from "~~/components/scaffold-move/Address";
 import { MINT_PAGE_ENABLED } from "~~/env";
 import { useGetCollectionDetails } from "~~/hooks/nft-minting/useGetCollectionDetails";
+import { useGetIpfsMetadata } from "~~/hooks/nft-minting/useGetIpfsMetadata";
 import { useLaunchpad } from "~~/hooks/nft-minting/useLaunchpad";
 import { useMintStages } from "~~/hooks/nft-minting/useMintStages";
+import { getIpfsHash, getIpfsUrl } from "~~/utils/nft-minting/ipfsUploader";
+import { CollectionMetadata } from "~~/utils/nft-minting/ipfsUploader";
 
 const CollectionDetailsPage: NextPage = () => {
   const launchpad = useLaunchpad();
@@ -25,6 +28,10 @@ const CollectionDetailsPage: NextPage = () => {
   ) as `0x${string}`;
 
   const { data: collectionDetails } = useGetCollectionDetails(collectionAddress);
+  const ipfs_metadata = useGetIpfsMetadata<CollectionMetadata>(
+    collectionDetails?.uri ? getIpfsHash(collectionDetails.uri) : "",
+  ).data;
+
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const totalQuantity = Object.values(quantities).reduce((sum, q) => sum + q, 0);
 
@@ -56,6 +63,11 @@ const CollectionDetailsPage: NextPage = () => {
     setQuantities(prev => ({ ...prev, [stageName]: quantity }));
   };
 
+  if (!collectionDetails || !ipfs_metadata) {
+    return null;
+  }
+  const imgUrl = getIpfsUrl(ipfs_metadata.image);
+
   if (!MINT_PAGE_ENABLED) {
     return (
       <div className="container mx-auto p-8">
@@ -71,7 +83,7 @@ const CollectionDetailsPage: NextPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
         <div className="space-y-6 md:col-span-2">
-          <NftImage imgUri={collectionDetails?.cdn_asset_uris?.cdn_image_uri ?? "/placeholder.png"} />
+          <NftImage imgUri={imgUrl ?? "/placeholder.png"} />
         </div>
 
         <div className="space-y-6 md:col-span-3">

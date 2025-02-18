@@ -58,7 +58,7 @@ export const defaultChains: Chains = {
     indexer: "https://indexer.testnet.movementnetwork.xyz/v1/graphql",
     faucet: "https://faucet.testnet.bardock.movementnetwork.xyz/",
     block_explorer: "https://explorer.movementnetwork.xyz",
-    explorer_network_param: "testnet",
+    explorer_network_param: "bardock+testnet",
     native_token_symbol: "MOVE",
   },
   movement_mainnet: {
